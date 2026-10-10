@@ -2,7 +2,7 @@
 // deployment names in LLM_BASE_URL / LLM_API_KEY / LLM_MODEL, and every capability uses it unless the
 // site, an environment variable or the admin's model page picks one of the site's named presets
 // (site/models.ts).
-import type { z } from "zod";
+import { z } from "zod";
 import { PRESETS } from "@aihot/site/models";
 import { config, credential } from "../config.ts";
 import { sha256 } from "../lib/ids.ts";
@@ -67,7 +67,7 @@ export interface ChatJsonOptions<S extends z.ZodType> {
   timeoutMs?: number;
   /** false: the model answers in its own text format (no JSON mode); `parse` turns it into the schema's input. */
   json?: boolean;
-  parse?: (content: string) => unknown;
+  parse?: (content: string,meta?:{finishReason?:string}) => unknown;
 }
 
 export interface ChatJsonResult<T> {
@@ -80,9 +80,11 @@ export interface ChatJsonResult<T> {
 
 export class ModelOutputError extends Error {
   readonly receiptId: number | null;
-  constructor(message: string, receiptId: number | null = null) {
+  readonly outputIssue: string | null;
+  constructor(message: string, receiptId: number | null = null, outputIssue: string | null = null) {
     super(message);
     this.receiptId = receiptId;
+    this.outputIssue = outputIssue;
   }
 }
 
@@ -198,7 +200,7 @@ export async function chatJson<S extends z.ZodType>(opts: ChatJsonOptions<S>): P
   const content = response.choices?.[0]?.message?.content ?? "";
   let parsed: z.infer<S>;
   try {
-    parsed = opts.schema.parse(opts.parse ? opts.parse(content) : extractJson(content));
+    parsed = opts.schema.parse(opts.parse ? opts.parse(content,{finishReason:response.choices?.[0]?.finish_reason}) : extractJson(content));
   } catch (error) {
     // Unusable output: record it and let a later attempt pay for a fresh answer. A reasoning model that
     // reasoned up to the output limit leaves an empty or cut-off answer; say so, and where to give it room.
@@ -206,7 +208,9 @@ export async function chatJson<S extends z.ZodType>(opts: ChatJsonOptions<S>): P
       ? `output token limit reached (finish_reason=length): a reasoning model may have spent it reasoning; give it room with ${spec.key === "default" ? "LLM_REASONING_TOKENS" : `reasoningTokens on preset ${spec.key}`}. ${String(error)}`
       : String(error);
     await rejectReceivedResponse(receipt.receiptId, `unusable output: ${detail.slice(0, 500)}`);
-    throw new ModelOutputError(`Model ${opts.model} returned unusable output for ${opts.subject}: ${detail.slice(0, 300)}`, receipt.receiptId);
+    const issue=error instanceof z.ZodError?error.issues[0]:undefined;
+    const outputIssue=issue?`字段 ${issue.path.join('.')} ${issue.code==='too_big'?`超过上限 ${issue.maximum}`:issue.code==='too_small'?'为空或不足最低要求':'格式不符合要求'}`:null;
+    throw new ModelOutputError(`Model ${opts.model} returned unusable output for ${opts.subject}: ${detail.slice(0, 300)}`, receipt.receiptId,outputIssue);
   }
   return { data: parsed, receiptId: receipt.receiptId, reused: receipt.reused, model: spec.key, usage: response.usage ?? null };
 }

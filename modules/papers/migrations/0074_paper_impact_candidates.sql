@@ -1,0 +1,21 @@
+CREATE TABLE paper_impact_candidates (
+  openalex_id text PRIMARY KEY,
+  doi text,
+  title text NOT NULL,
+  authors text NOT NULL DEFAULT '',
+  publication_year integer,
+  publication_date text NOT NULL DEFAULT '',
+  venue_name text NOT NULL DEFAULT '',
+  venue_type text NOT NULL DEFAULT '',
+  venue_url text NOT NULL DEFAULT '',
+  ccf_area text NOT NULL DEFAULT '',
+  ccf_rank text NOT NULL DEFAULT 'A',
+  citation_count integer CHECK (citation_count IS NULL OR citation_count >= 0),
+  citation_percentile_min double precision,
+  citation_percentile_max double precision,
+  openalex_url text NOT NULL,
+  doi_url text NOT NULL DEFAULT '',
+  open_access_url text NOT NULL DEFAULT '',
+  plan_ids text[] NOT NULL DEFAULT '{}',
+  fetched_at timestamptz NOT NULL DEFAULT now()
+);

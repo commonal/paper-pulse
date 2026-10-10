@@ -15,13 +15,26 @@ export interface NavItem {
   end?: boolean;
   /** Shows the unread dot while the changelog has news. */
   changelog?: boolean;
+  activePaths?: string[];
+}
+
+export interface Navigation {
+  sections: Array<{title:string;items:NavItem[]}>;
+  tabs: Tab[];
+  tabAliases?: Record<string,string>;
+  /** Shared detail pages can highlight the list the reader came from. */
+  resolveActivePath?: (pathname: string, state: unknown) => string;
+}
+
+export function sidebarPath(pathname: string, state: unknown): string {
+  return webModules().find(m=>m.navigation)?.navigation?.resolveActivePath?.(pathname,state) ?? pathname;
 }
 
 const SECTIONS: Array<{ title: string; items: NavItem[] }> = [
   {
     title: "内容",
     items: [
-      { to: "/", label: "精选", icon: IconBolt, end: true },
+      { to: "/news/featured", label: "精选", icon: IconBolt, end: true },
       { to: "/all", label: subjectAfter("全部", "动态"), icon: IconList },
       { to: "/hot", label: "热点榜", icon: IconFlame },
       { to: "/daily", label: withSubject("日报"), icon: IconDoc },
@@ -45,6 +58,8 @@ const SECTIONS: Array<{ title: string; items: NavItem[] }> = [
  * that is already there adds to it.
  */
 export function sidebar(): Array<{ title: string; items: NavItem[] }> {
+  const configured=webModules().find(m=>m.navigation)?.navigation;
+  if(configured)return configured.sections;
   const [content, ...rest] = SECTIONS;
   const more = rest.pop()!;
   const sections = [content!, ...rest].map((s) => ({ ...s, items: [...s.items] }));
@@ -60,6 +75,7 @@ export function sidebar(): Array<{ title: string; items: NavItem[] }> {
 /** A sidebar entry is lit on its pages; 日报 also covers weekly and monthly reports. */
 export function sidebarIsActive(item: NavItem, pathname: string): boolean {
   if (item.end) return pathname === item.to;
+  if(item.activePaths)return item.activePaths.some(path=>pathname===path||pathname.startsWith(`${path}/`));
   if (item.to === "/daily") return /^\/(daily|weekly|monthly)(\/|$)/.test(pathname);
   return pathname === item.to || pathname.startsWith(`${item.to}/`);
 }
@@ -86,7 +102,7 @@ export interface Tab {
 }
 
 const ENGINE_TABS: Tab[] = [
-  { key: "featured", to: "/", label: "精选", icon: IconBolt },
+  { key: "featured", to: "/news/featured", label: "精选", icon: IconBolt },
   { key: "hot", to: "/hot", label: "热点", icon: IconFlame },
   { key: "daily", to: "/daily", label: "日报", icon: IconDoc },
   { key: "me", to: "/more", label: "我的", icon: IconUser, changelog: true },
@@ -94,5 +110,11 @@ const ENGINE_TABS: Tab[] = [
 
 /** The tab bar: the engine's, the modules' before 我的. */
 export function tabs(): Tab[] {
+  const configured=webModules().find(m=>m.navigation)?.navigation;
+  if(configured)return configured.tabs;
   return [...ENGINE_TABS.slice(0, -1), ...webModules().flatMap((m) => m.tabs ?? []), ENGINE_TABS.at(-1)!];
+}
+
+export function canonicalTab(key: TabKey|undefined) {
+  return key ? webModules().find(m=>m.navigation)?.navigation?.tabAliases?.[key]??key : key;
 }

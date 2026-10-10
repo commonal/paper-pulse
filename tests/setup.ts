@@ -14,11 +14,18 @@ if (!/_(test|ci)$/.test(database)) {
   throw new Error(`Invariant tests write rows: point DATABASE_URL at a throwaway database named *_test or *_ci (got "${database}")`);
 }
 process.env.AIHOT_CREDENTIALS_DIR = "/nonexistent-test-credentials";
+// A developer's collector credentials/proxy must not turn anonymous fallback tests into external calls.
+process.env.JINA_API_KEY = "test-jina-key";
+process.env.JINA_BASE_URL = "http://127.0.0.1:1";
+process.env.EGRESS_PROXY_URL = "";
 process.env.SESSION_SECRET ??= "test-session-secret-0123456789";
 process.env.IMG_PROXY_SIGN_SECRET ??= "test-img-secret-0123456789";
 process.env.FEISHU_CONTENT_PUSH_ENABLED = "false";
 process.env.INDEXNOW_SUBMIT_ENABLED = "false";
 process.env.LOG_LEVEL ??= "error";
+// Test fixtures declare image support explicitly; a developer's live vision setting is not test input.
+process.env.LLM_VISION = "false";
+process.env.MINERU_CALLS_ENABLED = "false";
 // Paid providers are local stubs in these tests: calls and collection may run (the valves default off).
 process.env.MODEL_CALLS_ENABLED ??= "true";
 process.env.COLLECT_ENABLED ??= "true";

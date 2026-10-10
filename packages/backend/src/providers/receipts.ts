@@ -241,8 +241,11 @@ export async function releaseUnknownReceipt(db: Db, id: number, error: string): 
   return released ?? null;
 }
 
-export async function completeReceipt(db: Db, receiptId: number): Promise<void> {
-  await db`UPDATE receipts SET status = 'completed', completed_at = coalesce(completed_at, now()), updated_at = now() WHERE id = ${receiptId}`;
+export async function completeReceipt(db: Db, receiptId: number, acceptanceMetadata: Record<string, unknown> = {}): Promise<void> {
+  // Business modules may append an acceptance audit; the provider response and receipt lifecycle remain owned here.
+  await db`UPDATE receipts SET status = 'completed', error = NULL,
+    request = coalesce(request, '{}'::jsonb) || ${db.json(acceptanceMetadata as never)},
+    completed_at = coalesce(completed_at, now()), updated_at = now() WHERE id = ${receiptId}`;
 }
 
 /** Marks a received response that could not be used (e.g. unparsable) so a fresh attempt can be made. */

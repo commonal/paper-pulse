@@ -1,0 +1,1 @@
+ALTER TABLE paper_impact_candidates VALIDATE CONSTRAINT paper_impact_paper_fk;

@@ -7,6 +7,10 @@ and logo for your site.
 This repository also contains third-party material under its own terms:
 
 - assets/og-fonts/: Noto Sans SC, SIL Open Font License 1.1 (assets/og-fonts/LICENSE).
+- modules/papers/skills/paper-reading/: paper-reading core rules, Apache License 2.0.
+  Imported from techdou/paper-reading at commit 4dcaac6ac814332740a802d80af222136cdb1afc,
+  with original attribution to Agentchengfeng/paper-reading-skills.
+  Its LICENSE, NOTICE.md and upstream.json are retained with the imported files.
 
 The demo sources in industry/sources.json are public feeds of their publishers. Their content belongs
 to them; by default the site shows only a summary and a link to the original.

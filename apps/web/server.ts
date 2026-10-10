@@ -26,6 +26,7 @@ const BROWSER_MAX_SECONDS = 300;
 
 const TYPES: Record<string, string> = {
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",

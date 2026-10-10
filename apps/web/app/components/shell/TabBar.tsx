@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
 import { Link, useLocation, useRevalidator } from "react-router";
-import { tabs, type TabKey } from "./nav";
+import { tabs, canonicalTab, type TabKey } from "./nav";
 import { noteScreen, rememberedTab, useScreen } from "./screens";
 import { markBack } from "./transitions";
 import { useChangelogDot } from "./Sidebar";
@@ -24,7 +24,7 @@ export function TabBar({ changelogVersion }: { changelogVersion: string | null }
   const dot = useChangelogDot(changelogVersion);
   const last = useRef<TabKey | undefined>(undefined);
   const restored = useSyncExternalStore(subscribe, () => rememberedTab(key), serverTab);
-  const active = screen.tab ?? restored ?? last.current ?? screen.home;
+  const active = canonicalTab(screen.tab ?? restored ?? last.current ?? screen.home);
   useIsoLayoutEffect(() => {
     // Do not overwrite a saved entry with the server fallback before hydration reads this browser's tab.
     if (restored === null) return;

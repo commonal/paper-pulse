@@ -7,6 +7,7 @@ import { createServer, request } from "node:http";
 import type { AddressInfo } from "node:net";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import {dailyFixture} from './paper-fixtures.ts';
 
 let web: ChildProcess;
 let port: number;
@@ -15,6 +16,7 @@ const upstreamPaths: string[] = [];
 const api = createServer((req, res) => {
   upstreamPaths.push(req.url ?? "");
   res.setHeader("Content-Type", "application/json");
+  if (req.url?.startsWith("/api/admin/papers")) return res.end(JSON.stringify(req.url.startsWith('/api/admin/papers/today')?{papers:[],daily:dailyFixture()}:{papers:[]}));
   if (req.url === "/api/site/meta") return res.end(JSON.stringify({ changelogVersion: null }));
   if (req.url?.startsWith("/api/site/timeline")) return res.end(JSON.stringify({
     cards: [], nextCursor: null, dayCounts: {}, hot: [], filters: { category: null, channel: null, tag: null },
@@ -69,7 +71,7 @@ test("origin-form slashes keep the router's homepage and unknown-route semantics
       const res = await raw(path, method);
       assert.equal(res.status, 200, `${method} ${path}: ${logs}`);
       assert.equal(res.headers["content-type"], home.headers["content-type"]);
-      assert.match(res.headers["cache-control"] ?? "", /^public, max-age=\d+, s-maxage=\d+, must-revalidate$/);
+      assert.equal(res.headers["cache-control"], "private, no-store");
       if (method === "HEAD") assert.equal(res.body, "");
     }
     for (const path of ["/unknown-page", "//unknown-page", "//evil.invalid/unknown-page", "//unknown-page.data?token=private"]) {
@@ -80,5 +82,5 @@ test("origin-form slashes keep the router's homepage and unknown-route semantics
     }
   }
   assert.equal(logs, "");
-  assert.ok(upstreamPaths.every((path) => path.startsWith("/api/site/")));
+  assert.ok(upstreamPaths.every((path) => path.startsWith("/api/site/") || path.startsWith("/api/admin/papers")));
 });

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router";
 import { SITE } from "@aihot/site";
 import { Wordmark } from "@aihot/site/brand/Logo.tsx";
 import { useChangelogSeen } from "../../lib/local-state";
-import { sidebar, sidebarIsActive, type NavItem } from "./nav";
+import { sidebar, sidebarIsActive, sidebarPath, type NavItem } from "./nav";
 import { ThemeSwitch } from "./ThemeSwitch";
 import { IconGithub } from "../icons";
 
@@ -17,8 +17,8 @@ export function useChangelogDot(latestVersion: string | null): boolean {
 }
 
 function SideLink({ item, dot }: { item: NavItem; dot: boolean }) {
-  const { pathname } = useLocation();
-  const isActive = sidebarIsActive(item, pathname);
+  const { pathname, state } = useLocation();
+  const isActive = sidebarIsActive(item, sidebarPath(pathname, state));
   const Icon = item.icon;
   return (
     <Link

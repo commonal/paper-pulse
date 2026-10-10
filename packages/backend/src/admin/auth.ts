@@ -125,7 +125,7 @@ export function safeReturn(target: string): string {
       return "/admin";
     }
   }
-  return /^\/admin(\/|\?|$)/.test(path) && !path.startsWith("//") ? path : "/admin";
+  return (path === "/" || /^\/\?/.test(path) || /^\/(?:admin|papers)(\/|\?|$)/.test(path)) && !path.startsWith("//") ? path : "/admin";
 }
 
 interface FeishuUser {

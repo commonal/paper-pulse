@@ -65,14 +65,14 @@ export const FeedItem = memo(function FeedItem({ item, group, filters, read = fa
 
       {isX ? (
         <p className={`mt-1.5 whitespace-pre-line text-[15px] leading-[1.75] line-clamp-5 lg:mt-2 lg:line-clamp-4 ${read ? "text-ink-4" : "text-ink"}`}>
-          <IntentLink viewTransition to={`/items/${item.id}`} onClick={open} className="after:absolute after:inset-0 after:content-['']">
+          <IntentLink to={`/items/${item.id}`} onClick={open} className="after:absolute after:inset-0 after:content-['']">
             {item.summary ?? item.title}
           </IntentLink>
         </p>
       ) : (
         <>
           <h3 className={`mt-1.5 line-clamp-2 text-[17px] font-[650] leading-[1.5] lg:mt-2 lg:line-clamp-none lg:leading-[1.55] ${read ? "text-ink-4" : "text-ink"}`}>
-            <IntentLink viewTransition to={`/items/${item.id}`} onClick={open} className="after:absolute after:inset-0 after:content-['']">
+            <IntentLink to={`/items/${item.id}`} onClick={open} className="after:absolute after:inset-0 after:content-['']">
               {item.title}
             </IntentLink>
           </h3>
@@ -101,7 +101,7 @@ export const FeedItem = memo(function FeedItem({ item, group, filters, read = fa
       {item.sameEvent && (
         <p className="relative z-10 mt-2 line-clamp-1 text-[12.5px] text-ink-4">
           同一新闻，精选展示
-          <Link viewTransition to={`/items/${item.sameEvent.id}`} className="text-ink-3 transition-colors hover:text-accent">
+          <Link to={`/items/${item.sameEvent.id}`} className="text-ink-3 transition-colors hover:text-accent">
             《{item.sameEvent.title}》
           </Link>
         </p>

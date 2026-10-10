@@ -16,7 +16,7 @@ import type { Screen } from "../components/shell/screens";
 import type { TopicPagePart } from "../modules";
 import { loadParts } from "../site-modules";
 
-export const handle: Screen = { home: "me" };
+export const handle: Screen = { home: "featured" };
 export { shouldRevalidate } from "../lib/page-reuse";
 export const clientLoader = cachedLoader<typeof loader>();
 

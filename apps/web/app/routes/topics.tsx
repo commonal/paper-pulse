@@ -12,7 +12,7 @@ import { BrandMark } from "../components/BrandMark";
 import { PhoneBar } from "../components/shell/PhoneBar";
 import type { Screen } from "../components/shell/screens";
 
-export const handle: Screen = { home: "me", name: "主题" };
+export const handle: Screen = { tab: "featured", name: "主题" };
 export { shouldRevalidate } from "../lib/page-reuse";
 export const clientLoader = cachedLoader<typeof loader>();
 

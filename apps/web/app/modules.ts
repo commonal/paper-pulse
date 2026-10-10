@@ -7,7 +7,7 @@
 // renders them like any import.
 import type { ComponentType, ReactNode } from "react";
 import type { TopicSummary } from "@aihot/contracts/site";
-import type { NavItem, Tab } from "./components/shell/nav";
+import type { NavItem, Tab, Navigation } from "./components/shell/nav";
 
 export interface AdminNavEntry {
   to: string;
@@ -116,6 +116,8 @@ export interface TopicPagePart {
 export interface WebModule {
   /** Its folder under modules/. */
   name: string;
+  /** A site's complete navigation; the first declared plan replaces the engine's default groups. */
+  navigation?: Navigation;
   /** Desktop sidebar: entries in a section between the engine's 内容 and 更多; modules naming the same section share it. */
   sidebar?: { section: string; items: NavItem[] };
   /** Phone tab bar: tabs before 我的. */

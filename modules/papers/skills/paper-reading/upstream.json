@@ -1,0 +1,12 @@
+{
+  "files": [
+    "SKILL.md",
+    "LICENSE",
+    "NOTICE.md",
+    "references/reading-workflow.md",
+    "references/evidence-quality.md",
+    "references/output-contracts.md"
+  ],
+  "commit": "4dcaac6ac814332740a802d80af222136cdb1afc",
+  "repository": "https://github.com/techdou/paper-reading"
+}
